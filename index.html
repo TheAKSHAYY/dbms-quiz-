@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBMS Fundamentals Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --error: #f72585;
+            --warning: #f8961e;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark), #16213e);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .quiz-container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 900px;
+            padding: 2.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .score-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .score-icon {
+            color: var(--accent);
+        }
+
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.6s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        .question-container {
+            margin-bottom: 2.5rem;
+        }
+
+        .question-number {
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+
+        .question {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .option-letter {
+            background: rgba(255, 255, 255, 0.1);
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .option.correct {
+            background: rgba(76, 201, 240, 0.15);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .option.correct .option-letter {
+            background: var(--success);
+            color: var(--dark);
+        }
+
+        .option.wrong {
+            background: rgba(247, 37, 133, 0.15);
+            border-color: var(--error);
+            color: white;
+        }
+
+        .option.wrong .option-letter {
+            background: var(--error);
+            color: white;
+        }
+
+        .option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.9rem 2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-icon {
+            font-size: 1.2rem;
+        }
+
+        .result-container {
+            text-align: center;
+            padding: 2rem;
+            display: none;
+        }
+
+        .result-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+
+        .result-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .result-score {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .result-text {
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .restart-btn {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            margin: 0 auto;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 1.5rem;
+            }
+            
+            .title {
+                font-size: 1.5rem;
+            }
+            
+            .question {
+                font-size: 1.2rem;
+            }
+            
+            .option {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+            
+            .btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .controls {
+                flex-direction: column-reverse;
+                gap: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="header">
+            <h1 class="title">DBMS Fundamentals Quiz</h1>
+            <div class="score-container">
+                <i class="fas fa-star score-icon"></i>
+                <span id="score">0</span> / <span id="total-questions">50</span>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div id="quiz-content">
+            <div class="question-container">
+                <div class="question-number" id="question-number">Question 1 of 50</div>
+                <div class="question" id="question"></div>
+                <div class="options-container" id="options-container"></div>
+            </div>
+            <div class="controls">
+                <div id="feedback" style="color: var(--accent); font-weight: 500;"></div>
+                <button class="btn" id="next-btn" disabled>
+                    <span>Next Question</span>
+                    <i class="fas fa-arrow-right btn-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="result-container" class="result-container">
+            <i class="fas fa-trophy result-icon pulse"></i>
+            <h2 class="result-title">Quiz Completed!</h2>
+            <div class="result-score">Your Score: <span id="final-score">0</span> out of <span id="total-questions-final">50</span></div>
+            <p class="result-text" id="result-text"></p>
+            <button class="restart-btn" id="restart-btn">
+                <i class="fas fa-redo"></i> Restart Quiz
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const questionElement = document.getElementById('question');
+            const questionNumberElement = document.getElementById('question-number');
+            const optionsContainer = document.getElementById('options-container');
+            const nextButton = document.getElementById('next-btn');
+            const scoreElement = document.getElementById('score');
+            const totalQuestionsElement = document.getElementById('total-questions');
+            const finalScoreElement = document.getElementById('final-score');
+            const totalQuestionsFinalElement = document.getElementById('total-questions-final');
+            const quizContent = document.getElementById('quiz-content');
+            const resultContainer = document.getElementById('result-container');
+            const restartButton = document.getElementById('restart-btn');
+            const progressBar = document.getElementById('progress-bar');
+            const feedbackElement = document.getElementById('feedback');
+            const resultTextElement = document.getElementById('result-text');
+
+            // Quiz Variables
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let selectedOption = null;
+            let questions = [];
+            const letters = ['A', 'B', 'C', 'D'];
+
+            // Initialize the quiz
+            function initQuiz() {
+                questions = getDBMSQuestions();
+                totalQuestionsElement.textContent = questions.length;
+                totalQuestionsFinalElement.textContent = questions.length;
+                showQuestion();
+            }
+
+            // Display the current question
+            function showQuestion() {
+                resetState();
+                const currentQuestion = questions[currentQuestionIndex];
+                const questionNo = currentQuestionIndex + 1;
+                
+                // Update progress bar
+                progressBar.style.width = `${(questionNo / questions.length) * 100}%`;
+                questionNumberElement.textContent = `Question ${questionNo} of ${questions.length}`;
+                
+                questionElement.textContent = currentQuestion.question;
+                
+                currentQuestion.options.forEach((option, index) => {
+                    const button = document.createElement('div');
+                    button.textContent = option.text;
+                    button.classList.add('option', 'fade-in');
+                    button.addEventListener('click', () => selectOption(option, button));
+                    optionsContainer.appendChild(button);
+                });
+            }
+
+            // Reset the quiz state for the next question
+            function resetState() {
+                selectedOption = null;
+                nextButton.disabled = true;
+                feedbackElement.textContent = '';
+                while (optionsContainer.firstChild) {
+                    optionsContainer.removeChild(optionsContainer.firstChild);
+                }
+            }
+
+            // Handle option selection
+            function selectOption(option, button) {
+                if (selectedOption) return;
+                
+                selectedOption = option;
+                const isCorrect = option.correct;
+                
+                if (isCorrect) {
+                    button.classList.add('correct');
+                    score++;
+                    scoreElement.textContent = score;
+                    feedbackElement.textContent = 'Correct!';
+                    feedbackElement.style.color = 'var(--success)';
+                } else {
+                    button.classList.add('wrong');
+                    feedbackElement.textContent = 'Incorrect!';
+                    feedbackElement.style.color = 'var(--error)';
+                    
+                    // Highlight the correct answer
+                    const options = optionsContainer.children;
+                    for (let i = 0; i < options.length; i++) {
+                        if (questions[currentQuestionIndex].options[i].correct) {
+                            options[i].classList.add('correct');
+                            break;
+                        }
+                    }
+                }
+                
+                // Disable all options after selection
+                const options = optionsContainer.children;
+                for (let i = 0; i < options.length; i++) {
+                    options[i].classList.add('disabled');
+                }
+                
+                nextButton.disabled = false;
+            }
+
+            // Show the final results
+            function showResults() {
+                quizContent.style.display = 'none';
+                resultContainer.style.display = 'block';
+                finalScoreElement.textContent = score;
+                
+                // Custom result message based on score
+                const percentage = (score / questions.length) * 100;
+                let message = '';
+                
+                if (percentage >= 90) {
+                    message = 'Outstanding! You have mastered DBMS fundamentals.';
+                } else if (percentage >= 70) {
+                    message = 'Great job! You have a strong understanding of DBMS concepts.';
+                } else if (percentage >= 50) {
+                    message = 'Good effort! Review the topics you missed to improve.';
+                } else {
+                    message = 'Keep practicing! Review the basics and try again.';
+                }
+                
+                resultTextElement.textContent = message;
+            }
+
+            // Move to the next question or show results
+            function handleNextButton() {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    showQuestion();
+                } else {
+                    showResults();
+                }
+            }
+
+            // Event Listeners
+            nextButton.addEventListener('click', handleNextButton);
+            restartButton.addEventListener('click', () => {
+                currentQuestionIndex = 0;
+                score = 0;
+                scoreElement.textContent = score;
+                quizContent.style.display = 'block';
+                resultContainer.style.display = 'none';
+                showQuestion();
+            });
+
+            // Start the quiz
+            initQuiz();
+
+            // DBMS Questions
+            function getDBMSQuestions() {
+                return [
+                    // Database Fundamentals (25 questions)
+                    {
+                        question: "What is the primary purpose of a Database Management System (DBMS)?",
+                        options: [
+                            { text: "To store, retrieve and manage data efficiently", correct: true },
+                            { text: "To create graphical user interfaces", correct: false },
+                            { text: "To develop operating systems", correct: false },
+                            { text: "To design computer hardware", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of the following is NOT a characteristic of the relational data model?",
+                        options: [
+                            { text: "Data is organized in tables", correct: false },
+                            { text: "Tables are linked by relationships", correct: false },
+                            { text: "Data is stored in a hierarchical structure", correct: true },
+                            { text: "Uses SQL for querying data", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What does data independence refer to in DBMS?",
+                        options: [
+                            { text: "The ability to change schema without affecting applications", correct: true },
+                            { text: "Storing data in different locations", correct: false },
+                            { text: "Using different data types in a table", correct: false },
+                            { text: "Creating multiple copies of the same data", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which level of the DBMS architecture describes how data is actually stored?",
+                        options: [
+                            { text: "External level", correct: false },
+                            { text: "Conceptual level", correct: false },
+                            { text: "Internal level", correct: true },
+                            { text: "Physical level", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is the role of a Database Administrator (DBA)?",
+                        options: [
+                            { text: "Designing user interfaces", correct: false },
+                            { text: "Managing database structure and controlling access", correct: true },
+                            { text: "Developing application programs", correct: false },
+                            { text: "Creating hardware specifications", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT typically a database user type?",
+                        options: [
+                            { text: "Application programmers", correct: false },
+                            { text: "Sophisticated users", correct: false },
+                            { text: "Casual users", correct: false },
+                            { text: "Network administrators", correct: true }
+                        ]
+                    },
+                    {
+                        question: "What is a front-end tool in database systems?",
+                        options: [
+                            { text: "The physical storage device", correct: false },
+                            { text: "An interface that users interact with", correct: true },
+                            { text: "The database server software", correct: false },
+                            { text: "The backup system", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of the following is NOT an advantage of using DBMS?",
+                        options: [
+                            { text: "Data redundancy", correct: true },
+                            { text: "Data integrity", correct: false },
+                            { text: "Data security", correct: false },
+                            { text: "Data consistency", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is a tuple in relational database terminology?",
+                        options: [
+                            { text: "A column in a table", correct: false },
+                            { text: "A row in a table", correct: true },
+                            { text: "A relationship between tables", correct: false },
+                            { text: "A data type", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a function of DBMS?",
+                        options: [
+                            { text: "Data storage management", correct: false },
+                            { text: "Data manipulation", correct: false },
+                            { text: "Data definition", correct: false },
+                            { text: "Data visualization", correct: true }
+                        ]
+                    },
+                    {
+                        question: "What is a schema in database terms?",
+                        options: [
+                            { text: "The physical storage structure", correct: false },
+                            { text: "The logical structure of the database", correct: true },
+                            { text: "A backup copy of the database", correct: false },
+                            { text: "A query optimization technique", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which type of data independence allows changes to the conceptual schema without affecting application programs?",
+                        options: [
+                            { text: "Physical data independence", correct: false },
+                            { text: "Logical data independence", correct: true },
+                            { text: "Structural data independence", correct: false },
+                            { text: "Conceptual data independence", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is the main purpose of a data dictionary in DBMS?",
+                        options: [
+                            { text: "To store the actual database records", correct: false },
+                            { text: "To store metadata about the database", correct: true },
+                            { text: "To serve as a backup of the database", correct: false },
+                            { text: "To optimize query performance", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a responsibility of end users in a database system?",
+                        options: [
+                            { text: "Querying the database", correct: false },
+                            { text: "Generating reports", correct: false },
+                            { text: "Designing the database schema", correct: true },
+                            { text: "Entering data into the system", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is the main advantage of the three-schema architecture in DBMS?",
+                        options: [
+                            { text: "It allows different users to see the same data differently", correct: true },
+                            { text: "It makes the database run faster", correct: false },
+                            { text: "It reduces storage requirements", correct: false },
+                            { text: "It eliminates the need for backups", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which component of DBMS is responsible for concurrency control?",
+                        options: [
+                            { text: "Query processor", correct: false },
+                            { text: "Storage manager", correct: false },
+                            { text: "Transaction manager", correct: true },
+                            { text: "Data dictionary", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is the purpose of a view in relational databases?",
+                        options: [
+                            { text: "To physically store a subset of data", correct: false },
+                            { text: "To provide a virtual table based on a query", correct: true },
+                            { text: "To create an index for faster access", correct: false },
+                            { text: "To define relationships between tables", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a type of database user?",
+                        options: [
+                            { text: "Naive users", correct: false },
+                            { text: "Application programmers", correct: false },
+                            { text: "Database administrators", correct: false },
+                            { text: "Network architects", correct: true }
+                        ]
+                    },
+                    {
+                        question: "What is the main purpose of a front-end tool in database applications?",
+                        options: [
+                            { text: "To physically store the database", correct: false },
+                            { text: "To provide an interface for users to interact with data", correct: true },
+                            { text: "To optimize database queries", correct: false },
+                            { text: "To manage database transactions", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a component of DBMS architecture?",
+                        options: [
+                            { text: "Query processor", correct: false },
+                            { text: "Storage manager", correct: false },
+                            { text: "Transaction manager", correct: false },
+                            { text: "Network router", correct: true }
+                        ]
+                    },
+                    {
+                        question: "What is the primary advantage of logical data independence?",
+                        options: [
+                            { text: "Allows changes to storage structures without affecting applications", correct: false },
+                            { text: "Allows changes to conceptual schema without affecting applications", correct: true },
+                            { text: "Improves query performance", correct: false },
+                            { text: "Reduces data redundancy", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a typical DBA responsibility?",
+                        options: [
+                            { text: "Schema definition and modification", correct: false },
+                            { text: "Granting user access permissions", correct: false },
+                            { text: "Developing application programs", correct: true },
+                            { text: "Monitoring performance", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is the main purpose of the conceptual schema in DBMS?",
+                        options: [
+                            { text: "To describe the physical storage of data", correct: false },
+                            { text: "To describe the logical structure of the entire database", correct: true },
+                            { text: "To define user views of the database", correct: false },
+                            { text: "To optimize query execution", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a benefit of using DBMS?",
+                        options: [
+                            { text: "Reduced application development time", correct: false },
+                            { text: "Improved data sharing", correct: false },
+                            { text: "Increased data redundancy", correct: true },
+                            { text: "Better data integrity", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is the primary function of the external schema in DBMS architecture?",
+                        options: [
+                            { text: "To define how data is physically stored", correct: false },
+                            { text: "To describe the entire database structure", correct: false },
+                            { text: "To define how specific users view the data", correct: true },
+                            { text: "To optimize query performance", correct: false }
+                        ]
+                    },
+
+                    // E-R Modeling (25 questions)
+                    {
+                        question: "What does an entity represent in E-R modeling?",
+                        options: [
+                            { text: "A relationship between tables", correct: false },
+                            { text: "A distinct object or concept in the real world", correct: true },
+                            { text: "A database query", correct: false },
+                            { text: "A constraint on data values", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a type of attribute in E-R modeling?",
+                        options: [
+                            { text: "Simple attribute", correct: false },
+                            { text: "Composite attribute", correct: false },
+                            { text: "Derived attribute", correct: false },
+                            { text: "Virtual attribute", correct: true }
+                        ]
+                    },
+                    {
+                        question: "What is an entity set in E-R modeling?",
+                        options: [
+                            { text: "A collection of similar entities", correct: true },
+                            { text: "A group of related tables", correct: false },
+                            { text: "A set of database constraints", correct: false },
+                            { text: "A collection of database users", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which symbol represents an entity in an E-R diagram?",
+                        options: [
+                            { text: "Rectangle", correct: true },
+                            { text: "Diamond", correct: false },
+                            { text: "Oval", correct: false },
+                            { text: "Double rectangle", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is a key attribute in E-R modeling?",
+                        options: [
+                            { text: "An attribute that uniquely identifies an entity", correct: true },
+                            { text: "An attribute used for sorting data", correct: false },
+                            { text: "An attribute that links two entities", correct: false },
+                            { text: "An attribute with numeric values", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these represents a relationship in E-R modeling?",
+                        options: [
+                            { text: "An association among entities", correct: true },
+                            { text: "A constraint on attribute values", correct: false },
+                            { text: "A database table", correct: false },
+                            { text: "A user view of the database", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What does the cardinality of a relationship indicate?",
+                        options: [
+                            { text: "The number of entities that can be related", correct: true },
+                            { text: "The importance of the relationship", correct: false },
+                            { text: "The direction of the relationship", correct: false },
+                            { text: "The attributes involved in the relationship", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a valid relationship type?",
+                        options: [
+                            { text: "One-to-one", correct: false },
+                            { text: "One-to-many", correct: false },
+                            { text: "Many-to-many", correct: false },
+                            { text: "Some-to-none", correct: true }
+                        ]
+                    },
+                    {
+                        question: "What is a weak entity in E-R modeling?",
+                        options: [
+                            { text: "An entity that doesn't have a key attribute", correct: true },
+                            { text: "An entity with few attributes", correct: false },
+                            { text: "An entity that is rarely used", correct: false },
+                            { text: "An entity with no relationships", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which symbol represents a relationship in an E-R diagram?",
+                        options: [
+                            { text: "Rectangle", correct: false },
+                            { text: "Diamond", correct: true },
+                            { text: "Oval", correct: false },
+                            { text: "Double rectangle", correct: false }
+                        ]                       
+                    },
+                    {
+                        question: "What is a composite attribute in E-R modeling?",
+                        options: [
+                            { text: "An attribute that can be divided into smaller sub-attributes", correct: true },
+                            { text: "An attribute with multiple values", correct: false },
+                            { text: "An attribute that is derived from other attributes", correct: false },
+                            { text: "An attribute that links two entities", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a type of relationship in E-R modeling?",
+                        options: [
+                            { text: "Unary relationship", correct: false },
+                            { text: "Binary relationship", correct: false },
+                            { text: "Ternary relationship", correct: false },
+                            { text: "Quaternary relationship", correct: true }
+                        ]
+                    },
+                    {
+                        question: "What does a dashed oval represent in an E-R diagram?",
+                        options: [
+                            { text: "A weak entity", correct: false },
+                            { text: "A derived attribute", correct: true },
+                            { text: "A key attribute", correct: false },
+                            { text: "A relationship", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is the purpose of normalization in database design?",
+                        options: [
+                            { text: "To reduce data redundancy and improve data integrity", correct: true },
+                            { text: "To increase data redundancy for faster access", correct: false },
+                            { text: "To create complex queries", correct: false },
+                            { text: "To enhance user interfaces", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a normal form in database normalization?",
+                        options: [
+                            { text: "First Normal Form (1NF)", correct: false },
+                            { text: "Second Normal Form (2NF)", correct: false },
+                            { text: "Third Normal Form (3NF)", correct: false },
+                            { text: "Fourth Normal Form (4NF)", correct: true }
+                        ]
+                    },
+                    {
+                        question: "What is the main goal of the Entity-Relationship (E-R) model?",
+                        options: [
+                            { text: "To define the physical storage of data", correct: false },
+                            { text: "To represent data and relationships in a graphical format", correct: true },
+                            { text: "To optimize query performance", correct: false },
+                            { text: "To manage user access permissions", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What does a double diamond represent in an E-R diagram?",
+                        options: [
+                            { text: "A weak relationship", correct: false },
+                            { text: "A multi-valued attribute", correct: true },
+                            { text: "A derived attribute", correct: false },
+                            { text: "A key attribute", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a type of attribute in E-R modeling?",
+                        options: [
+                            { text: "Simple attribute", correct: false },
+                            { text: "Composite attribute", correct: false },
+                            { text: "Multi-valued attribute", correct: false },
+                            { text: "Virtual attribute", correct: true }
+                        ]
+                    },
+                    {
+                        question: "What is the purpose of an E-R diagram?",
+                        options: [
+                            { text: "To visualize the structure of a database", correct: true },
+                            { text: "To optimize query performance", correct: false },
+                            { text: "To manage user access permissions", correct: false },
+                            { text: "To define the physical storage of data", correct: false }
+                        ]
+
+                    },
+                    {
+                        question: "What does a single line represent in an E-R diagram?",
+                        options: [
+                            { text: "A one-to-one relationship", correct: true },
+                            { text: "A one-to-many relationship", correct: false },
+                            { text: "A many-to-many relationship", correct: false },
+                            { text: "A weak entity", correct: false }
+                        ]
+                    },
+                    {   
+                        question: "Which of these is NOT a type of key in E-R modeling?",
+                        options: [
+                            { text: "Primary key", correct: false },
+                            { text: "Foreign key", correct: false },
+                            { text: "Candidate key", correct: false },
+                            { text: "Secondary key", correct: true }
+                        ]
+                    },
+                    {
+                        question: "What is the purpose of a primary key in a database?",
+                        options: [
+                            { text: "To uniquely identify each record in a table", correct: true },
+                            { text: "To link two tables together", correct: false },
+                            { text: "To store metadata about the database", correct: false },
+                            { text: "To optimize query performance", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What does a crow's foot notation represent in E-R modeling?",
+                        options: [
+                            { text: "A one-to-one relationship", correct: false },
+                            { text: "A one-to-many relationship", correct: true },
+                            { text: "A many-to-many relationship", correct: false },
+                            { text: "A weak entity", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is the purpose of a foreign key in a database?",
+                        options: [
+                            { text: "To uniquely identify each record in a table", correct: false },
+                            { text: "To link two tables together", correct: true },
+                            { text: "To store metadata about the database", correct: false },
+                            { text: "To optimize query performance", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What does a dashed rectangle represent in an E-R diagram?",
+                        options: [
+                            { text: "A weak entity set", correct: true },
+                            { text: "A strong entity set", correct: false },
+                            { text: "A derived attribute", correct: false },
+                            { text: "A relationship", correct: false }
+                        ]
+                    },
+                    {
+                        question: "What is the purpose of a relationship set in E-R modeling?",
+                        options: [
+                            { text: "To define the physical storage of data", correct: false },
+                            { text: "To represent a collection of relationships", correct: true },
+                            { text: "To optimize query performance", correct: false },
+                            { text: "To manage user access permissions", correct: false }
+                        ]
+                    },
+                    {
+                        question: "Which of these is NOT a type of relationship in E-R modeling?",
+                        options: [
+                            { text: "Unary relationship", correct: false },
+                            { text: "Binary relationship", correct: false },
+                            { text: "Ternary relationship", correct: false },
+                            { text: "Quaternary relationship", correct: true }
+                        ]
+
+
+
+
+
+
+
+
+
+
+
+
+                    }
+                ];
+            }
+        });
+    </script>
+</body>
+</html>
+
